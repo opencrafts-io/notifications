@@ -3,7 +3,7 @@ from django.conf import settings
 
 class UserProfile(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    onesignal_player_id = models.CharField(max_length=255, unique=True)
+    external_id = models.CharField(max_length=255, unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -16,7 +16,8 @@ class Notification(models.Model):
     title = models.CharField(max_length=255)
     message = models.TextField()
     url = models.URLField(max_length=500, blank=True, null=True)
-    type = models.CharField(max_length=50, blank=True, null=True)
+    image_url = models.URLField(max_length=500, blank=True, null=True)
+    name = models.CharField(max_length=50, blank=True, null=True)
     data = models.JSONField(blank=True, null=True)
     is_read = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -41,7 +42,8 @@ class BroadcastNotification(models.Model):
     title = models.CharField(max_length=255)
     message = models.TextField()
     url = models.URLField(max_length=500, blank=True, null=True)
-    type = models.CharField(max_length=50, blank=True, null=True)
+    image_url = models.URLField(max_length=500, blank=True, null=True)
+    name = models.CharField(max_length=50, blank=True, null=True)
     data = models.JSONField(blank=True, null=True)
     onesignal_notification_id = models.CharField(max_length=255, blank=True, null=True, unique=True)
     sent_at = models.DateTimeField(auto_now_add=True)
@@ -54,7 +56,7 @@ class BroadcastNotification(models.Model):
         ordering = ['-sent_at']
         indexes = [
             models.Index(fields=['-sent_at']),
-            models.Index(fields=['type']),
+            models.Index(fields=['name']),
             models.Index(fields=['sent_by']),
         ]
 

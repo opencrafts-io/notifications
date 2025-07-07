@@ -10,10 +10,10 @@ CustomUser = get_user_model()
 @pytest.mark.unit
 def test_user_profile_creation():
     user = CustomUser.objects.create_user(email='profile_test@example.com', password='password')
-    profile = UserProfile.objects.create(user=user, onesignal_player_id='abc-123-def')
+    profile = UserProfile.objects.create(user=user, external_id='abc-123-def')
 
     assert profile.user == user
-    assert profile.onesignal_player_id == 'abc-123-def'
+    assert profile.external_id == 'abc-123-def'
     assert profile.created_at is not None
     assert profile.updated_at is not None
     assert str(profile) == f"Profile for {user.email}"
@@ -27,7 +27,7 @@ def test_notification_creation():
         title="Test Title",
         message="This is a test message.",
         url="http://example.com/test",
-        type="info",
+        name="info",
         data={"key": "value"}
     )
 
@@ -35,7 +35,7 @@ def test_notification_creation():
     assert notification.title == "Test Title"
     assert notification.message == "This is a test message."
     assert notification.url == "http://example.com/test"
-    assert notification.type == "info"
+    assert notification.name == "info"
     assert notification.data == {"key": "value"}
     assert not notification.is_read
     assert notification.created_at is not None

@@ -6,10 +6,8 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-# ONESIGNAL_APP_ID = settings.ONESIGNAL_APP_ID
-# ONESIGNAL_REST_API_KEY = os.environ.get("ONESIGNAL_REST_API_KEY")
 
-def send_push_notification(title, message, player_ids=None, external_user_ids=None, included_segments=None, filters=None, data=None, url=None):
+def send_push_notification(title, message, player_ids=None, external_user_ids=None, included_segments=None, filters=None, data=None, url=None, image_url=None):
     """
     Sends a push notification using the OneSignal API.
 
@@ -27,6 +25,7 @@ def send_push_notification(title, message, player_ids=None, external_user_ids=No
                                   Example: [{"field": "tag", "key": "level", "relation": ">", "value": "10"}]
         data (dict, optional): Custom data to send with the notification.
         url (str, optional): A URL to open when the notification is clicked.
+        image_url (str, optional): An image to include in the notification.
 
     Returns:
         dict: The JSON response from the OneSignal API, or an error dictionary.
@@ -52,6 +51,11 @@ def send_push_notification(title, message, player_ids=None, external_user_ids=No
         payload["data"] = data
     if url:
         payload["url"] = url
+    if image_url:
+        payload["big_picture"] = image_url
+        payload["ios_attachments"] = {"id1": image_url}  # For iOS rich notifications
+        payload["chrome_web_image"] = image_url  # For web push notifications
+
 
     # Determine targeting
     target_count = sum([
@@ -78,7 +82,6 @@ def send_push_notification(title, message, player_ids=None, external_user_ids=No
         return {"error": "No valid recipient target provided."}
 
     try:
-        print(f"hereeeeeeeeeeeeeeeeeeeee!!!!!!!!!!!!!!!! : {payload}")
         response = requests.post(
             "https://onesignal.com/api/v1/notifications",
             headers=headers,

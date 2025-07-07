@@ -14,7 +14,7 @@ def test_notification_serializer():
         title="Serializer Test",
         message="Message content.",
         url="http://test.com",
-        type="test_type",
+        name="test_name",
         data={"some_key": "some_value"},
         is_read=True,
         onesignal_notification_id="os_id_123"
@@ -29,7 +29,7 @@ def test_notification_serializer():
     assert data['title'] == "Serializer Test"
     assert data['message'] == "Message content."
     assert data['url'] == "http://test.com"
-    assert data['type'] == "test_type"
+    assert data['name'] == "test_name"
     assert data['data'] == {"some_key": "some_value"}
     assert data['is_read'] is True
     assert data['created_at'] is not None
@@ -46,16 +46,16 @@ def test_notification_serializer():
 @pytest.mark.unit
 def test_user_profile_onesignal_serializer_valid_data():
     user = CustomUser.objects.create_user(email='profile_serializer@example.com', password='password')
-    profile = UserProfile.objects.create(user=user, onesignal_player_id="old_player_id")
+    profile = UserProfile.objects.create(user=user, external_id="old_player_id")
 
-    data = {'onesignal_player_id': 'new_player_id_456'}
+    data = {'external_id': 'new_player_id_456'}
     serializer = UserProfileOneSignalSerializer(instance=profile, data=data, partial=True)
     assert serializer.is_valid(raise_exception=True)
     
     updated_profile = serializer.save()
 
-    assert updated_profile.onesignal_player_id == 'new_player_id_456'
-    assert UserProfile.objects.get(user=user).onesignal_player_id == 'new_player_id_456'
+    assert updated_profile.external_id == 'new_player_id_456'
+    assert UserProfile.objects.get(user=user).external_id == 'new_player_id_456'
 
 @pytest.mark.django_db
 @pytest.mark.unit
@@ -67,5 +67,5 @@ def test_user_profile_onesignal_serializer_missing_player_id():
     serializer = UserProfileOneSignalSerializer(instance=profile, data=data)
     
     assert not serializer.is_valid()
-    assert 'onesignal_player_id' in serializer.errors
-    assert 'This field is required.' in serializer.errors['onesignal_player_id']
+    assert 'external_id' in serializer.errors
+    assert 'This field is required.' in serializer.errors['external_id']

@@ -69,7 +69,7 @@ class RegisterOneSignalPlayerIdView(generics.UpdateAPIView):
         serializer.is_valid(raise_exception=True)
         self.perform_update(serializer)
         
-        logger.info(f"User {self.request.user.email} updated OneSignal Player ID to: {instance.onesignal_player_id}")
+        logger.info(f"User {self.request.user.email} updated OneSignal Player ID to: {instance.external_id}")
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -77,7 +77,6 @@ class RegisterOneSignalPlayerIdView(generics.UpdateAPIView):
 class SendNotificationToUserView(generics.CreateAPIView):
     """
     API endpoint for sending push notifications to a single user.
-    Open for now. Add authentication later.
     """
     permission_classes = [AllowAny]
     serializer_class = NotificationSerializer
@@ -93,8 +92,8 @@ class SendNotificationToUserView(generics.CreateAPIView):
 
         user_profile = UserProfile.objects.filter(user=recipient_user).first()
 
-        if not user_profile or not user_profile.onesignal_player_id:
-            logger.warning(f"User {recipient_user.id} has no OneSignal player ID. Notification not sent.")
+        if not user_profile or not user_profile.external_id:
+            logger.warning(f"User {recipient_user.id} has no OneSignal external ID. Notification not sent.")
             return Response(
                 {"detail": "User does not have a registered push notification ID."},
                 status=status.HTTP_400_BAD_REQUEST
@@ -104,16 +103,17 @@ class SendNotificationToUserView(generics.CreateAPIView):
         onesignal_payload_data = {
             "notification_id": str(notification.id),
             "url": notification.url,
-            "type": notification.type,
+            "name": notification.name,
             **(notification.data or {})
         }
 
         onesignal_response = send_push_notification(
             title=notification.title,
             message=notification.message,
-            external_user_ids=[user_profile.onesignal_player_id],
+            external_user_ids=[user_profile.external_id],
             data=onesignal_payload_data,
-            url=notification.url
+            url=notification.url,
+            image_url=notification.image_url
         )
 
         if onesignal_response and "id" in onesignal_response:
@@ -152,7 +152,7 @@ class SendBroadcastNotificationView(generics.CreateAPIView):
         onesignal_payload_data = {
             "broadcast_id": str(broadcast_record.id), 
             "url": broadcast_record.url,
-            "type": broadcast_record.type,
+            "name": broadcast_record.name,
             **(broadcast_record.data or {})
         }
         
@@ -163,7 +163,8 @@ class SendBroadcastNotificationView(generics.CreateAPIView):
                 message=broadcast_record.message,
                 included_segments=broadcast_record.included_segments,
                 data=onesignal_payload_data,
-                url=broadcast_record.url
+                url=broadcast_record.url,
+                image_url=broadcast_record.image_url
             )
         else:
             onesignal_response = send_push_notification(
@@ -171,7 +172,8 @@ class SendBroadcastNotificationView(generics.CreateAPIView):
                 message=broadcast_record.message,
                 filters=broadcast_record.filters,
                 data=onesignal_payload_data,
-                url=broadcast_record.url
+                url=broadcast_record.url,
+                image_url=broadcast_record.image_url
             )
 
         if onesignal_response and "id" in onesignal_response:

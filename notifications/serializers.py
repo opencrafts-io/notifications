@@ -11,8 +11,8 @@ class NotificationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Notification
         fields = [
-            'id', 'recipient', 'recipient_email', 'title', 'message', 'url',
-            'type', 'data', 'is_read', 'created_at', 'updated_at', 'onesignal_notification_id'
+            'id', 'recipient', 'recipient_email', 'title', 'message', 'url', 'image_url',
+            'name', 'data', 'is_read', 'created_at', 'updated_at', 'onesignal_notification_id'
         ]
         read_only_fields = ['id', 'recipient_email', 'created_at', 'updated_at', 'onesignal_notification_id']
 
@@ -23,7 +23,7 @@ class BroadcastNotificationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = BroadcastNotification
-        fields = ['id','title','message','url','type','data','included_segments','filters','sent_by','onesignal_notification_id','sent_at']
+        fields = ['id','title','message','url','image_url','name','data','included_segments','filters','sent_by','onesignal_notification_id','sent_at']
         read_only_fields = ['id', 'sent_at', 'onesignal_notification_id']
 
     def validate(self, data):
@@ -42,14 +42,14 @@ class BroadcastNotificationSerializer(serializers.ModelSerializer):
         return data
 
 class UserProfileOneSignalSerializer(serializers.ModelSerializer):
-    onesignal_player_id = serializers.CharField(
+    external_id = serializers.CharField(
         max_length=255, 
         required=True,
         allow_null=False,
     )
     class Meta:
         model = UserProfile
-        fields = ['onesignal_player_id']
+        fields = ['external_id']
         extra_kwargs = {
-            'onesignal_player_id': {'required': True, 'allow_null': False}
+            'external_id': {'required': True, 'allow_null': False}
         }

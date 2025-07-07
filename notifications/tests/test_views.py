@@ -16,7 +16,7 @@ def user(db):
 
 @pytest.fixture
 def user_profile(user):
-    return UserProfile.objects.create(user=user, onesignal_player_id="mock-player-id")
+    return UserProfile.objects.create(user=user, external_id="mock-player-id")
 
 @patch("notifications.views.send_push_notification")
 def test_send_notification_to_user_success(mock_send, api_client, user_profile):
@@ -26,7 +26,7 @@ def test_send_notification_to_user_success(mock_send, api_client, user_profile):
         "recipient": user_profile.user.id,
         "title": "Test Title",
         "message": "Test message",
-        "type": "info"
+        "name": "info"
     }
     response = api_client.post(url, payload, format="json")
 
@@ -41,7 +41,7 @@ def test_send_notification_no_player_id(mock_send, api_client, user):
         "recipient": user.id,
         "title": "No Player",
         "message": "User has no player ID",
-        "type": "info"
+        "name": "info"
     }
     response = api_client.post(url, payload, format="json")
     assert response.status_code == status.HTTP_400_BAD_REQUEST
@@ -56,7 +56,7 @@ def test_send_notification_onesignal_failure(mock_send, api_client, user_profile
         "recipient": user_profile.user.id,
         "title": "Fail",
         "message": "Simulate failure",
-        "type": "info"
+        "name": "info"
     }
     response = api_client.post(url, payload, format="json")
 
@@ -72,7 +72,7 @@ def test_send_broadcast_notification_segments(mock_send, api_client):
     payload = {
         "title": "Broadcast",
         "message": "Broadcast msg",
-        "type": "alert",
+        "name": "alert",
         "included_segments": ["Active Users"]
     }
     response = api_client.post(url, payload, format="json")
@@ -89,7 +89,7 @@ def test_send_broadcast_notification_failure(mock_send, api_client):
     payload = {
         "title": "Fail Broadcast",
         "message": "Fail broadcast",
-        "type": "alert",
+        "name": "alert",
         "filters": [{"field": "tag", "key": "role", "relation": "=", "value": "admin"}]
     }
     response = api_client.post(url, payload, format="json")
