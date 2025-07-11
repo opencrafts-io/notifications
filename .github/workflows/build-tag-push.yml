@@ -36,6 +36,8 @@ jobs:
       PGHOST: localhost
       PGPORT: 5432
       DJANGO_SETTINGS_MODULE: notifications_manager.settings
+      ONESIGNAL_APP_ID: dummy-id-signal-moja
+      ONESIGNAL_API_KEY: dummmy-api-key-signal-moja
 
     steps:
       - name: Checkout Code
