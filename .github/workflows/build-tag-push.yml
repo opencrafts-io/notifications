@@ -63,7 +63,7 @@ jobs:
 
       - name: Run Migrations
         run: |
-          python manage.py makemigrations
+          python manage.py makemigrations users notifications
           python manage.py migrate
 
       - name: Run Tests
