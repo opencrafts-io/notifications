@@ -74,9 +74,15 @@ cp .env.example .env
 Edit `.env` to include:
 
 ```env
-DATABASE_URL=postgres://postgres:postgres@localhost:5432/notifications
 ONESIGNAL_APP_ID=your-onesignal-app-id
 ONESIGNAL_API_KEY=your-onesignal-api-key
+
+DB_NAME=notifications
+DB_USER=your-user
+DB_PASSWORD=your-password
+DB_HOST=localhost
+DB_PORT=5432
+
 
 ```
 
@@ -85,6 +91,7 @@ ONESIGNAL_API_KEY=your-onesignal-api-key
 ### 6. 🔨 Run Migrations
 
 ```bash
+python manage.py makemigrations users notifications
 python manage.py migrate
 ```
 
@@ -132,8 +139,3 @@ To view test coverage:
 ```bash
 pytest --cov=notifications
 ```
-
-
-## 📄 License
-
-MIT © 2025 Your Name
